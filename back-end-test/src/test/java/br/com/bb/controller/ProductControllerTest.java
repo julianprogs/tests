@@ -1,21 +1,24 @@
 package br.com.bb.controller;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 import br.com.bb.Application;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @RunWith(SpringRunner.class)
@@ -35,7 +38,9 @@ public class ProductControllerTest {
 
 	@Test
     public void listByCategoryAlimentos() throws Exception {
-        mockMvc.perform(get("/product/listByCategory/1"))
+        mockMvc.perform(get("/product/listByCategory/1")
+        		.contentType(MediaType.APPLICATION_JSON)
+        		.characterEncoding("utf-8"))
         .andExpect(status().isOk())
 	    		.andExpect(jsonPath("$", hasSize(2)))
 	        .andExpect(jsonPath("$[0].id", is(1)))
@@ -46,7 +51,9 @@ public class ProductControllerTest {
 
 	@Test
 	public void listByCategoryEletrodomésticos() throws Exception {
-		mockMvc.perform(get("/product/listByCategory/2"))
+		mockMvc.perform(get("/product/listByCategory/2")
+				.contentType(MediaType.APPLICATION_JSON)
+        		.characterEncoding("utf-8"))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$", hasSize(3)))
 		.andExpect(jsonPath("$[0].id", is(3)))
@@ -59,7 +66,9 @@ public class ProductControllerTest {
 
 	@Test
 	public void listByCategoryMóveis() throws Exception {
-		mockMvc.perform(get("/product/listByCategory/3"))
+		mockMvc.perform(get("/product/listByCategory/3")
+				.contentType(MediaType.APPLICATION_JSON)
+        		.characterEncoding("utf-8"))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$", hasSize(3)))
 		.andExpect(jsonPath("$[0].id", is(6)))
@@ -68,5 +77,29 @@ public class ProductControllerTest {
 		.andExpect(jsonPath("$[1].name", is("Mesa")))
 		.andExpect(jsonPath("$[2].id", is(8)))
 		.andExpect(jsonPath("$[2].name", is("Estante")));
+	}
+	
+	@Test
+	public void listByCategoryNoContent() throws Exception {
+		mockMvc.perform(get("/product/listByCategory/999")
+				.contentType(MediaType.APPLICATION_JSON)
+        		.characterEncoding("utf-8"))
+		.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void listByCategoryBadRequest() throws Exception {
+		mockMvc.perform(get("/product/listByCategory/A")
+				.contentType(MediaType.APPLICATION_JSON)
+        		.characterEncoding("utf-8"))
+		.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void listByCategoryNotFound() throws Exception {
+		mockMvc.perform(get("/product/listByCategory/")
+				.contentType(MediaType.APPLICATION_JSON)
+        		.characterEncoding("utf-8"))
+		.andExpect(status().isNotFound());
 	}
 }
